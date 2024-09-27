@@ -1,39 +1,41 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 // set token secret and expiration date
-const secret = 'mysecretsshhhhh';
-const expiration = '2h';
+const secret = "mysecretsshhhhh";
+const expiration = "2h";
 
 module.exports = {
-  // function for our authenticated routes
-  authMiddleware: function (req, res, next) {
-    // allows token to be sent via  req.query or headers
-    let token = req.query.token || req.headers.authorization;
+  // Function to extract the token from the request (for GraphQL)
+  authMiddleware: function ({ req }) {
+    // Token can come from the request headers, authorization, or body
+    let token = req.body.token || req.query.token || req.headers.authorization;
 
-    // ["Bearer", "<tokenvalue>"]
+    // If the token comes from authorization header, remove "Bearer" if present
     if (req.headers.authorization) {
-      token = token.split(' ').pop().trim();
+      token = token.split(" ").pop().trim();
     }
 
+    // If no token, return the request without modifying it (no user attached)
     if (!token) {
-      return res.status(400).json({ message: 'You have no token!' });
+      return req;
     }
 
-    // verify token and get user data out of it
     try {
+      // Verify the token and extract user data
       const { data } = jwt.verify(token, secret, { maxAge: expiration });
+      // Attach the user to the request
       req.user = data;
-    } catch {
-      console.log('Invalid token');
-      return res.status(400).json({ message: 'invalid token!' });
+    } catch (err) {
+      console.log("Invalid token");
     }
 
-    // send to next endpoint
-    next();
+    // Return the request with or without the user attached
+    return req;
   },
+
+  // Function to sign a token (used for login and user creation)
   signToken: function ({ username, email, _id }) {
     const payload = { username, email, _id };
-
     return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
   },
 };

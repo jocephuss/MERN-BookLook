@@ -1,21 +1,47 @@
-const express = require('express');
-const path = require('path');
-const db = require('./config/connection');
-const routes = require('./routes');
+const express = require("express");
+const path = require("path");
+const { ApolloServer } = require("apollo-server-express");
+const { authMiddleware } = require("./utils/auth"); // Import the authMiddleware
+const db = require("./config/connection");
 
+// Import typeDefs and resolvers
+const { typeDefs, resolvers } = require("./schemas");
+
+// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+// Apollo Server setup
+const server = new ApolloServer({
+  typeDefs, // Provide the type definitions
+  resolvers,
+  context: ({ req }) => authMiddleware({ req }), // Add authMiddleware to context
+});
 
-// if we're in production, serve client/build as static assets
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
-}
+server.start().then(() => {
+  // Start the server and connect to the database
+  server.applyMiddleware({ app });
 
-app.use(routes);
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json()); // Parse JSON bodies
 
-db.once('open', () => {
-  app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
+  if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../client/build"))); // Serve static assets from the client/build folder in production mode
+  }
+
+  // Default route to serve the React app
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/build/index.html"));
+  });
+
+  // Start the server once the database is connected
+  db.once("open", () => {
+    app.listen(PORT, () => {
+      // Log the server start message to the console
+      console.log(`🌍 Now listening on localhost:${PORT}`);
+      console.log(
+        `🚀 GraphQL is now available at http://localhost:${PORT}${server.graphqlPath}`
+      );
+    });
+  });
 });
