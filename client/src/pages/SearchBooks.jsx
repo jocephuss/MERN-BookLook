@@ -6,65 +6,71 @@ import { SAVE_BOOK } from "../utils/mutations";
 import { saveBookIds, getSavedBookIds } from "../utils/localStorage";
 
 const SearchBooks = () => {
-  // State variables for the search input and the fetched book data
   const [searchedBooks, setSearchedBooks] = useState([]);
   const [searchInput, setSearchInput] = useState("");
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
-  // Use the SAVE_BOOK mutation
-  const [saveBook] = useMutation(SAVE_BOOK); // Use the mutation to save the book to the database
+  const [saveBook] = useMutation(SAVE_BOOK);
 
   useEffect(() => {
+    // Fetch saved bookIds when the component mounts
     return () => saveBookIds(savedBookIds);
   });
 
+  const searchGoogleBooks = async (query) => {
+    // Function to search Google Books API
+    const response = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=${query}`
+    );
+    if (!response.ok) {
+      throw new Error("Something went wrong with the Google Books API");
+    }
+    const data = await response.json();
+    return data; // Return the book data
+  };
+
   const handleFormSubmit = async (event) => {
-    // Handle form submission event
-    event.preventDefault();
+    // Function to handle form submission
+    event.preventDefault(); // Prevent the form from submitting normally
 
     if (!searchInput) {
+      // If the search input is empty, return early
       return false;
     }
 
     try {
-      const response = await searchGoogleBooks(searchInput); // Call the searchGoogleBooks function to fetch the book data from the Google Books API
+      const response = await searchGoogleBooks(searchInput); // Send the search query to the Google Books API
 
-      if (!response.ok) {
-        throw new Error("something went wrong!"); // Handle any errors that occur during the API call
-      }
-
-      const { items } = await response.json(); // Extract the book data from the Google Books API response
-
-      const bookData = items.map((book) => ({
-        // Map the book data to the required format
+      const bookData = response.items.map((book) => ({
+        // Map the book data to the desired format
         bookId: book.id,
-        authors: book.volumeInfo.authors || ["No author to display"], // Add the authors to the book data
+        authors: book.volumeInfo.authors || ["No author to display"],
         title: book.volumeInfo.title,
         description: book.volumeInfo.description,
         image: book.volumeInfo.imageLinks?.thumbnail || "",
       }));
 
-      setSearchedBooks(bookData); // Set the searchedBooks state with the fetched book data
-      setSearchInput(""); // Clear the search input
+      setSearchedBooks(bookData);
+      setSearchInput("");
     } catch (err) {
       console.error(err);
     }
   };
 
   const handleSaveBook = async (bookId) => {
-    // Save the book to the database and local storage
-    const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+    // Function to save a book
+    const bookToSave = searchedBooks.find((book) => book.bookId === bookId); // Find the book in the searchedBooks array by its bookId
 
-    const token = Auth.loggedIn() ? Auth.getToken() : null; // Get the token from localStorage or null if not logged in
+    const token = Auth.loggedIn() ? Auth.getToken() : null; // Check if there's a token in localStorage
 
     if (!token) {
       return false;
     }
 
     try {
-      // Use the saveBook mutation instead of the saveBook() from the API file
       const { data } = await saveBook({
-        variables: { bookData: { ...bookToSave } }, // Pass the bookData as input to the mutation
+        // Use the saveBook mutation instead of the saveBook API call
+        variables: { bookData: { ...bookToSave } }, // Send bookData to the mutation
       });
 
       setSavedBookIds([...savedBookIds, bookToSave.bookId]); // Add the bookId to the savedBookIds state

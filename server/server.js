@@ -5,8 +5,13 @@ const { authMiddleware } = require("./utils/auth"); // Import the authMiddleware
 const db = require("./config/connection");
 const { typeDefs, resolvers } = require("./schemas");
 
-// Import typeDefs and resolvers
-const { typeDefs, resolvers } = require("./schemas");
+// Connect to the MongoDB database
+
+db.once("open", () => {
+  console.log("��� MongoDB connection successful!");
+});
+
+// Import the schema, resolvers, and type definitions
 
 // Initialize Express app
 const app = express();
