@@ -1,52 +1,44 @@
+const { ApolloServer } = require("apollo-server-express");
 const express = require("express");
 const path = require("path");
-const { ApolloServer } = require("apollo-server-express");
-const { authMiddleware } = require("./utils/auth"); // Import the authMiddleware
-const db = require("./config/connection");
 const { typeDefs, resolvers } = require("./schemas");
+const db = require("./config/connection");
 
-// Connect to the MongoDB database
-
-db.once("open", () => {
-  console.log("��� MongoDB connection successful!");
-});
-
-// Import the schema, resolvers, and type definitions
-
-// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Apollo Server setup
+// Create Apollo server instance
 const server = new ApolloServer({
-  typeDefs, // Provide the type definitions
+  // Apollo Server options
+  typeDefs,
   resolvers,
-  context: ({ req }) => authMiddleware({ req }), // Add authMiddleware to context
 });
 
 server.start().then(() => {
-  // Start the server and connect to the database
+  // Connect to MongoDB and start the Express server
   server.applyMiddleware({ app });
 
-  app.use(express.urlencoded({ extended: true }));
-  app.use(express.json()); // Parse JSON bodies
+  // Middleware for Express app
+  app.use(express.urlencoded({ extended: false }));
+  app.use(express.json());
 
+  // Serve up static assets
   if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../client/build"))); // Serve static assets from the client/build folder in production mode
+    // Serve static assets in production mode
+    app.use(express.static(path.join(__dirname, "../client/build")));
   }
 
-  // Default route to serve the React app
   app.get("*", (req, res) => {
+    // Send React app to the client if in production mode
     res.sendFile(path.join(__dirname, "../client/build/index.html"));
   });
 
-  // Start the server once the database is connected
   db.once("open", () => {
+    // Connect to MongoDB
     app.listen(PORT, () => {
-      // Log the server start message to the console
-      console.log(`🌍 Now listening on localhost:${PORT}`);
+      console.log(`API server running on port ${PORT}!`);
       console.log(
-        `🚀 GraphQL is now available at http://localhost:${PORT}${server.graphqlPath}`
+        `Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`
       );
     });
   });
