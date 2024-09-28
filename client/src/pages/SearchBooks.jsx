@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Container, Col, Form, Button, Card, Row } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
-import Auth from "../utils/auth";
+import AuthService from "../utils/auth";
 import { SAVE_BOOK } from "../utils/mutations";
 import { saveBookIds, getSavedBookIds } from "../utils/localStorage";
 
@@ -58,19 +58,19 @@ const SearchBooks = () => {
   };
 
   const handleSaveBook = async (bookId) => {
-    // Function to save a book
-    const bookToSave = searchedBooks.find((book) => book.bookId === bookId); // Find the book in the searchedBooks array by its bookId
+    // Function to save a book to the database
+    const bookToSave = searchedBooks.find((book) => book.bookId === bookId); // Find the book in the searchedBooks array
 
-    const token = Auth.loggedIn() ? Auth.getToken() : null; // Check if there's a token in localStorage
-
-    if (!token) {
+    // Ensure the user is logged in
+    if (!AuthService.loggedIn()) {
+      console.log("You need to be logged in to save a book!");
       return false;
     }
 
     try {
       const { data } = await saveBook({
-        // Use the saveBook mutation instead of the saveBook API call
-        variables: { bookData: { ...bookToSave } }, // Send bookData to the mutation
+        // Send book data to the mutation
+        variables: { bookData: { ...bookToSave } },
       });
 
       setSavedBookIds([...savedBookIds, bookToSave.bookId]); // Add the bookId to the savedBookIds state
@@ -128,7 +128,7 @@ const SearchBooks = () => {
                     <Card.Title>{book.title}</Card.Title>
                     <p className="small">Authors: {book.authors}</p>
                     <Card.Text>{book.description}</Card.Text>
-                    {Auth.loggedIn() && (
+                    {AuthService.loggedIn() && (
                       <Button
                         disabled={savedBookIds?.some(
                           (savedBookId) => savedBookId === book.bookId

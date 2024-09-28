@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../utils/mutations";
-import Auth from "../utils/auth";
+import AuthService from "../utils/auth";
 
 const LoginForm = () => {
   // LoginForm component
@@ -37,7 +37,7 @@ const LoginForm = () => {
         variables: { ...userFormData },
       });
 
-      Auth.login(data.login.token); // Login the user with the token
+      AuthService.login(data.login.token); // Login the user with the token
     } catch (err) {
       // If there's an error, display an error message and reset the form
       console.error(err);
