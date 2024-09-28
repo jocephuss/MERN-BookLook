@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Container, Card, Button, Row, Col } from "react-bootstrap";
-import { useQuery, useMutation } from "@apollo/client"; // Apollo Client hooks
-import { GET_ME } from "../utils/queries"; // Import GraphQL query
-import { REMOVE_BOOK } from "../utils/mutations"; // Import GraphQL mutation
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_ME } from "../utils/queries";
+import { REMOVE_BOOK } from "../utils/mutations";
 import Auth from "../utils/auth";
 import { removeBookId } from "../utils/localStorage";
 
