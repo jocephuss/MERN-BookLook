@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Container, Card, Button, Row, Col } from "react-bootstrap";
 import { useQuery, useMutation } from "@apollo/client";
 import { GET_ME } from "../utils/queries";
@@ -46,11 +45,10 @@ const SavedBooks = () => {
   return (
     <>
       {/* Header section */}
-      <div fluid className="text-light bg-dark p-5">
-        <Container>
-          <h1>Viewing saved books!</h1>
-        </Container>
-      </div>
+
+      <Container fluid className="text-light bg-dark p-5">
+        <h1>Viewing saved books!</h1>
+      </Container>
 
       {/* Books display section */}
       <Container>

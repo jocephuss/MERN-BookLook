@@ -52,14 +52,11 @@ const resolvers = {
           { _id: context.user._id },
           { $addToSet: { savedBooks: bookData } },
           { new: true }
-        ).populate("savedBooks");
-
+        );
         return updatedUser;
       }
-
       throw new AuthenticationError("You need to be logged in!");
     },
-
     // Mutation for removing a book from the user's list
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {

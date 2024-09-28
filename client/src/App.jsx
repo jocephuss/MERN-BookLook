@@ -16,8 +16,9 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  // Set the token in the headers for each request
+  // Function to add authorization headers to the request
   const token = AuthService.getToken();
+  console.log("Token being passed:", token);
   return {
     headers: {
       ...headers,

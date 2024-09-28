@@ -72,10 +72,11 @@ const SearchBooks = () => {
         // Send book data to the mutation
         variables: { bookData: { ...bookToSave } },
       });
+      console.log("Book saved, response:", data); // Log the saved book data to the console
 
       setSavedBookIds([...savedBookIds, bookToSave.bookId]); // Add the bookId to the savedBookIds state
     } catch (err) {
-      console.error(err);
+      console.error("Error saving book", err);
     }
   };
 
