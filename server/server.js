@@ -8,11 +8,13 @@ const { authMiddleware } = require("./utils/auth"); // Import auth middleware
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Initialize Apollo Server
+// Initialize Apollo Server with caching and disabling persisted queries
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: authMiddleware, // Pass the auth middleware here
+  cache: "bounded", // Use bounded cache to prevent memory exhaustion
+  persistedQueries: false, // Disable persisted queries to avoid cache-related issues
 });
 
 server.start().then(() => {
