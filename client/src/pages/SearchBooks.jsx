@@ -17,10 +17,11 @@ const SearchBooks = () => {
     return () => saveBookIds(savedBookIds);
   });
 
+  const API_KEY = "AIzaSyDpM3qDOipjXHhc8Ccu4jN_lo-2QSvV34k";
   const searchGoogleBooks = async (query) => {
     // Function to search Google Books API
     const response = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${query}`
+      `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${API_KEY}`
     );
     if (!response.ok) {
       throw new Error("Something went wrong with the Google Books API");

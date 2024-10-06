@@ -1,20 +1,22 @@
+require("dotenv").config(); // Load environment variables
+
 const { ApolloServer } = require("apollo-server-express");
 const express = require("express");
 const path = require("path");
 const { typeDefs, resolvers } = require("./schemas");
 const db = require("./config/connection");
-const { authMiddleware } = require("./utils/auth"); // Import auth middleware
+const { authMiddleware } = require("./utils/auth");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Initialize Apollo Server with caching and disabling persisted queries
+// Initialize Apollo Server
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: authMiddleware, // Pass the auth middleware here
-  cache: "bounded", // Use bounded cache to prevent memory exhaustion
-  persistedQueries: false, // Disable persisted queries to avoid cache-related issues
+  context: authMiddleware,
+  cache: "bounded", // Add cache settings to prevent memory exhaustion
+  persistedQueries: false, // Disable persisted queries for security
 });
 
 server.start().then(() => {
