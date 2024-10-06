@@ -3,42 +3,36 @@ const express = require("express");
 const path = require("path");
 const { typeDefs, resolvers } = require("./schemas");
 const db = require("./config/connection");
+const { authMiddleware } = require("./utils/auth"); // Import auth middleware
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Create Apollo server instance
+// Initialize Apollo Server
 const server = new ApolloServer({
-  // Apollo Server options
   typeDefs,
   resolvers,
+  context: authMiddleware, // Pass the auth middleware here
 });
 
 server.start().then(() => {
-  // Connect to MongoDB and start the Express server
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app, path: "/graphql" });
 
-  // Middleware for Express app
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  // Serve up static assets
   if (process.env.NODE_ENV === "production") {
-    // Serve static assets in production mode
     app.use(express.static(path.join(__dirname, "../client/build")));
   }
 
   app.get("*", (req, res) => {
-    // Send React app to the client if in production mode
     res.sendFile(path.join(__dirname, "../client/build/index.html"));
   });
 
   db.once("open", () => {
-    // Connect to MongoDB
     app.listen(PORT, () => {
-      console.log(`API server running on port ${PORT}!`);
       console.log(
-        `Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`
+        `🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`
       );
     });
   });

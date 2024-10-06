@@ -5,49 +5,42 @@ import { ADD_USER } from "../utils/mutations";
 import AuthService from "../utils/auth";
 
 const SignupForm = () => {
-  // SignupForm component
   const [userFormData, setUserFormData] = useState({
     username: "",
     email: "",
     password: "",
-  }); // State variable for storing user form data
+  });
   const [validated] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); // State variable for showing alert
+  const [showAlert, setShowAlert] = useState(false);
 
-  // Use the ADD_USER mutation
   const [addUser, { error }] = useMutation(ADD_USER);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setUserFormData({ ...userFormData, [name]: value }); // Update the userFormData state with the input values
+    setUserFormData({ ...userFormData, [name]: value });
   };
 
   const handleFormSubmit = async (event) => {
-    // Handle form submission event
     event.preventDefault();
 
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      // Check if form has everything (as per react-bootstrap docs)
       event.preventDefault();
       event.stopPropagation();
     }
 
     try {
-      // Call the ADD_USER mutation
       const { data } = await addUser({
-        // Pass the userFormData as input to the mutation });
         variables: { ...userFormData },
       });
 
-      AuthService.login(data.addUser.token); // Login the user with the token
+      AuthService.login(data.addUser.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
 
     setUserFormData({
-      // Clear the userFormData state and reset the form
       username: "",
       email: "",
       password: "",

@@ -1,5 +1,3 @@
-import decode from "jwt-decode";
-
 class AuthService {
   // Retrieve the token from localStorage
   getToken() {
@@ -24,12 +22,14 @@ class AuthService {
 
   // Log in the user by saving the token to localStorage
   login(idToken) {
-    localStorage.setItem("id_token", idToken);
+    localStorage.setItem("id_token", idToken); // Make sure the token is saved
+    window.location.assign("/"); // Redirect user after login
   }
 
   // Log out the user by removing the token from localStorage
   logout() {
-    localStorage.removeItem("id_token");
+    localStorage.removeItem("id_token"); // Clear token
+    window.location.assign("/"); // Redirect user to home
   }
 }
 

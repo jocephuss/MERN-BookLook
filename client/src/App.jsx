@@ -1,4 +1,3 @@
-import "./App.css";
 import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import {
@@ -10,15 +9,15 @@ import {
 import { setContext } from "@apollo/client/link/context";
 import AuthService from "./utils/auth";
 
-// Create a link to the GraphQL server
+// Create an HTTP link to the GraphQL endpoint
 const httpLink = createHttpLink({
   uri: "http://localhost:3001/graphql", // GraphQL endpoint
 });
 
+// Attach token to headers for authorization
 const authLink = setContext((_, { headers }) => {
-  // Function to add authorization headers to the request
   const token = AuthService.getToken();
-  console.log("Token being passed:", token);
+  console.log("Token:", token);
   return {
     headers: {
       ...headers,
@@ -27,14 +26,13 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-// Set up Apollo Client
+// Set up Apollo Client with authentication link and cache
 const client = new ApolloClient({
-  link: authLink.concat(httpLink), // Add the authentication link to the HTTP link
-  cache: new InMemoryCache(), // Use the InMemoryCache for caching
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
 });
 
 function App() {
-  // Wrap the App component in ApolloProvider to provide the Apollo Client instance
   return (
     <ApolloProvider client={client}>
       <Navbar />
