@@ -1,8 +1,10 @@
-require("dotenv").config(); // Load environment variables
+require("dotenv").config();
 
 const { ApolloServer } = require("apollo-server-express");
 const express = require("express");
 const path = require("path");
+const helmet = require("helmet");
+const cors = require("cors");
 const { typeDefs, resolvers } = require("./schemas");
 const db = require("./config/connection");
 const { authMiddleware } = require("./utils/auth");
@@ -15,17 +17,17 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: authMiddleware,
-  cache: "bounded", // Add cache settings to prevent memory exhaustion
-  persistedQueries: false, // Disable persisted queries for security
+  cache: "bounded",
+  persistedQueries: false,
 });
+
+// Middleware
+app.use(helmet()); // Secure your app by setting various HTTP headers
+app.use(cors()); // Enable CORS for all routes
 
 server.start().then(() => {
   server.applyMiddleware({ app, path: "/graphql" });
 
-  const cors = require("cors");
-  app.use(cors());
-  const helmet = require("helmet");
-  app.use(helmet());
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
