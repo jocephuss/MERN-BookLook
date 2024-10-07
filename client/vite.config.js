@@ -9,10 +9,9 @@ export default defineConfig({
     open: true,
     proxy: {
       "/graphql": {
-        // Add this line to proxy GraphQL requests
-        target: "http://localhost:3001",
-        secure: false,
+        target: "https://mern-booklook.onrender.com", // Point to Render deployment URL
         changeOrigin: true,
+        secure: false,
       },
     },
   },
