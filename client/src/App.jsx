@@ -11,7 +11,7 @@ import AuthService from "./utils/auth";
 
 // Create an HTTP link to the GraphQL endpoint
 const httpLink = createHttpLink({
-  uri: "http://localhost:3001/graphql", // GraphQL endpoint
+  uri: "https://mern-booklook.onrender.com/graphql",
 });
 
 // Attach token to headers for authorization
