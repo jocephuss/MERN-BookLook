@@ -22,8 +22,18 @@ const server = new ApolloServer({
 });
 
 // Middleware
-app.use(helmet()); // Secure your app by setting various HTTP headers
-app.use(cors()); // Enable CORS for all routes
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://static.cloudflareinsights.com"],
+        connectSrc: ["'self'", "https://www.googleapis.com"],
+      },
+    },
+  })
+);
+app.use(cors());
 
 server.start().then(() => {
   server.applyMiddleware({ app, path: "/graphql" });
