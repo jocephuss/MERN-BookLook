@@ -27,7 +27,7 @@ create a log in, search titles and save to your profile!
 
 ## License
 
-This project is licensed under the MIT license. See the [MIT License]([MIT License](https://opensource.org/licenses/MIT)) file for details.
+This project is licensed under the MIT license. See the ([MIT License](https://opensource.org/licenses/MIT)) file for details.
 
 
 ## Contributing
