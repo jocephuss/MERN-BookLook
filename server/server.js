@@ -29,7 +29,7 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "https://static.cloudflareinsights.com"],
         connectSrc: ["'self'", "https://www.googleapis.com"],
-        imgSrc: ["'self'", "data:"],
+        imgSrc: ["'self'", "data:", "https://books.google.com"],
       },
     },
   })
